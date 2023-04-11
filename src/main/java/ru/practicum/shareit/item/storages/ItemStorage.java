@@ -8,8 +8,12 @@ import java.util.Optional;
 
 public interface ItemStorage {
     Item createItem(Item item);
+
     Item updateItem(ItemDto itemDto);
+
     Optional<Item> findItemById(int itemId);
+
     List<ItemDto> findUserItems(int ownerId);
+
     List<ItemDto> findItemsByString(String text);
 }
