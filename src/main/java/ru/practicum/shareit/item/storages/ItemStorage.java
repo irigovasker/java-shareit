@@ -13,7 +13,7 @@ public interface ItemStorage {
 
     Optional<Item> findItemById(int itemId);
 
-    List<ItemDto> findUserItems(int ownerId);
+    List<Item> findUserItems(int ownerId);
 
-    List<ItemDto> findItemsByString(String text);
+    List<Item> findItemsByString(String text);
 }

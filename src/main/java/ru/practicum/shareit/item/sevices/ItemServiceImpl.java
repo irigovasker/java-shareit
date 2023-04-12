@@ -10,6 +10,7 @@ import ru.practicum.shareit.utils.ObjectNotFoundException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,9 +19,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto createItem(ItemDto itemDto, int ownerId) {
-        return ItemMapper.toItemDto(itemStorage.createItem(
-                new Item(itemDto.getName(), itemDto.getDescription(), true, ownerId, null)
-        ));
+        return ItemMapper.toItemDto(itemStorage.createItem(ItemMapper.toNewItem(itemDto, ownerId)));
     }
 
     @Override
@@ -40,7 +39,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getUserItems(int ownerId) {
-        return itemStorage.findUserItems(ownerId);
+        return itemStorage.findUserItems(ownerId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
@@ -48,6 +47,6 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemStorage.findItemsByString(text);
+        return itemStorage.findItemsByString(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 }

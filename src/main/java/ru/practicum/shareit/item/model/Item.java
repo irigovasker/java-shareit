@@ -4,9 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.request.ItemRequest;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Getter
 @Setter
 public class Item {

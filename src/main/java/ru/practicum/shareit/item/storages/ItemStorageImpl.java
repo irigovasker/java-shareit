@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.storages;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.utils.ObjectNotFoundException;
@@ -47,19 +46,18 @@ public class ItemStorageImpl implements ItemStorage {
     }
 
     @Override
-    public List<ItemDto> findUserItems(int ownerId) {
+    public List<Item> findUserItems(int ownerId) {
         return data.values().stream()
-                .filter(item -> item.getOwner() == ownerId).map(ItemMapper::toItemDto).collect(Collectors.toList());
+                .filter(item -> item.getOwner() == ownerId).collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> findItemsByString(String text) {
+    public List<Item> findItemsByString(String text) {
         String textLowerCase = text.toLowerCase();
         return data.values().stream()
                 .filter(item -> item.isAvailable() && (
                         item.getName().toLowerCase().contains(textLowerCase) ||
                                 item.getDescription().toLowerCase().contains(textLowerCase)
-                ))
-                .map(ItemMapper::toItemDto).collect(Collectors.toList());
+                )).collect(Collectors.toList());
     }
 }
