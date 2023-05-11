@@ -1,5 +1,6 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +10,8 @@ import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
-public class User {
+@Builder
+public class UserDto {
     private int id;
     @NotEmpty
     @NotBlank
