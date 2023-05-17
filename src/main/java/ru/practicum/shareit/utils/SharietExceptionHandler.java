@@ -9,10 +9,15 @@ import java.util.Map;
 
 @RestControllerAdvice(basePackages = "ru.practicum.shareit")
 public class SharietExceptionHandler {
+    @ExceptionHandler
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleBadRequest(BadRequestException e) {
+        return Map.of("error", e.getMessage());
+    }
 
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public Map<String, String> handleObjectNotFound(ObjectNotFoundException e) {
+    public Map<String, String> handleNotFound(NotFoundException e) {
         return Map.of("error", e.getMessage());
     }
 

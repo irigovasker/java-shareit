@@ -2,39 +2,48 @@ package ru.practicum.shareit.user.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.storages.UserStorage;
-import ru.practicum.shareit.utils.ObjectNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.models.User;
+import ru.practicum.shareit.user.repositories.UsersRepository;
+import ru.practicum.shareit.user.utils.UserMapper;
+import ru.practicum.shareit.utils.NotFoundException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
+    private final UsersRepository usersRepository;
 
     @Override
-    public List<User> getAllUsers() {
-        return userStorage.findAllUsers();
+    public List<UserDto> getAllUsers() {
+        return usersRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     @Override
-    public User createUser(User user) {
-        return userStorage.createUser(user);
+    @Transactional
+    public UserDto createUser(UserDto userDto) {
+        return UserMapper.toUserDto(usersRepository.save(UserMapper.toNewUser(userDto)));
     }
 
     @Override
-    public User getUserById(int id) {
-        return userStorage.findUserById(id).orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден"));
+    public UserDto getUserById(int id) {
+        return UserMapper.toUserDto(usersRepository.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден")));
     }
 
     @Override
-    public User updateUser(User user) {
-        return userStorage.updateUser(user);
+    @Transactional
+    public UserDto updateUser(UserDto userDto) {
+        User userFromDB = usersRepository.findById(userDto.getId()).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return UserMapper.toUserDto(usersRepository.save(UserMapper.updateFields(userFromDB, userDto)));
     }
 
     @Override
+    @Transactional
     public void deleteUser(int userId) {
-        userStorage.removeUser(userId);
+        usersRepository.deleteById(userId);
     }
 }

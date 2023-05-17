@@ -1,6 +1,6 @@
 package ru.practicum.shareit.user.storages;
 
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.models.User;
 
 import java.util.List;
 import java.util.Optional;

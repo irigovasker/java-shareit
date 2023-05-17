@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.storages;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.utils.ObjectNotFoundException;
+import ru.practicum.shareit.utils.NotFoundException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +31,7 @@ public class ItemStorageImpl implements ItemStorage {
     @Override
     public Item updateItem(ItemDto itemDto) {
         if (!data.containsKey(itemDto.getId())) {
-            throw new ObjectNotFoundException("Несуществующая вещь");
+            throw new NotFoundException("Несуществующая вещь");
         }
         Item item = data.get(itemDto.getId());
         item.setName(itemDto.getName() != null ? itemDto.getName() : item.getName());

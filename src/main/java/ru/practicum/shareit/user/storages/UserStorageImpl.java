@@ -1,8 +1,8 @@
 package ru.practicum.shareit.user.storages;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.utils.ObjectNotFoundException;
+import ru.practicum.shareit.user.models.User;
+import ru.practicum.shareit.utils.NotFoundException;
 
 import java.util.*;
 
@@ -29,7 +29,7 @@ public class UserStorageImpl implements UserStorage {
     @Override
     public User updateUser(User user) {
         if (!data.containsKey(user.getId())) {
-            throw new ObjectNotFoundException("Несуществующий пользователь");
+            throw new NotFoundException("Несуществующий пользователь");
         }
 
         if (user.getEmail() != null) {
