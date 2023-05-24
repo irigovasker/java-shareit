@@ -77,4 +77,10 @@ public class Validator {
             throw new BadRequestException("Начало не может быть в прошлом");
         }
     }
+
+    public static void validatePaginationParams(int from, int size) {
+        if (size < 1 || from < 0) {
+            throw new BadRequestException("Неверные параметры");
+        }
+    }
 }
