@@ -2,7 +2,7 @@ package ru.practicum.shareit.booking.repositories;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.models.Booking;
 import ru.practicum.shareit.booking.utils.BookingStatus;
 
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Component
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findBookingsByBooker_IdAndStartBeforeAndEndAfterOrderByStartDesc(int userId, LocalDateTime start, LocalDateTime end, Pageable pageable);
 

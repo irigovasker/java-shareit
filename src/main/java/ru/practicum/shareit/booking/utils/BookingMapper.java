@@ -9,12 +9,12 @@ import ru.practicum.shareit.user.models.User;
 import ru.practicum.shareit.user.utils.UserMapper;
 
 public class BookingMapper {
-    public static Booking toNewBooking(BookingCreateDto bookingDto, User user, Item item) {
+    public static Booking toNewBooking(BookingCreateDto bookingDto, User booker, Item item) {
         return Booking.builder()
                 .start(bookingDto.getStart())
                 .end(bookingDto.getEnd())
                 .item(item)
-                .booker(user)
+                .booker(booker)
                 .status(BookingStatus.WAITING)
                 .build();
     }

@@ -72,8 +72,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemOwnerDto> getUserItems(int ownerId, int from, int size) {
         return itemsRepository.loadBookingsInItems(
-                itemsRepository.findItemsWithCommentsByOwnerId(ownerId, PageRequest.of(from, size)))
-                .stream()
+                        itemsRepository.findItemsWithCommentsByOwnerId(ownerId, PageRequest.of(from, size))
+                ).stream()
                 .map(
                         item -> ItemMapper.toItemOwnerDto(
                                 item, toCommentDtoList(item.getComments()), toBookingCreateDtoList(item.getBookings())
