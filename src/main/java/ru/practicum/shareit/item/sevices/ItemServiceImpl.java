@@ -1,13 +1,16 @@
 package ru.practicum.shareit.item.sevices;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.models.Booking;
 import ru.practicum.shareit.booking.repositories.BookingRepository;
 import ru.practicum.shareit.booking.utils.BookingMapper;
 import ru.practicum.shareit.booking.utils.BookingStatus;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.comment.models.Comment;
 import ru.practicum.shareit.item.comment.repositories.CommentsRepository;
 import ru.practicum.shareit.item.comment.utils.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
@@ -40,7 +43,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto updateItem(ItemDto itemDto, int ownerId) {
-        Item item = itemsRepository.findById(itemDto.getId()).orElseThrow(() -> new NotFoundException("Несуществующая вещь"));
+        Item item = itemsRepository.findById(
+                itemDto.getId()).orElseThrow(() -> new NotFoundException("Несуществующая вещь")
+        );
         if (item.getOwner() != ownerId) {
             throw new NotFoundException("Нет доступа для редактирования");
         }
@@ -49,35 +54,45 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemOwnerDto getItemById(int itemId, int userId) {
-        Item item = itemsRepository.findItemByIdWithComments(itemId).orElseThrow(() -> new NotFoundException("Несуществующая вещь"));
+        Item item = itemsRepository.findItemByIdWithComments(
+                itemId).orElseThrow(() -> new NotFoundException("Несуществующая вещь")
+        );
         if (item.getOwner() != userId) {
-            return ItemMapper.toItemOwnerDto(item, item.getComments().stream().map(CommentMapper::toDto).collect(Collectors.toList()));
+            return ItemMapper.toItemOwnerDto(item, toCommentDtoList(item.getComments()));
         } else {
             item = itemsRepository.loadBookingsInItem(item).orElseThrow(() -> new NotFoundException("Несуществующая вещь"));
-            return ItemMapper.toItemOwnerDto(item,
-                    item.getComments().stream().map(CommentMapper::toDto).collect(Collectors.toList()),
-                    item.getBookings().stream().filter(b -> b.getStatus() == BookingStatus.APPROVED).map(BookingMapper::toBookingCreateDto).collect(Collectors.toList())
+            return ItemMapper.toItemOwnerDto(
+                    item,
+                    toCommentDtoList(item.getComments()),
+                    toBookingCreateDtoList(item.getBookings())
             );
         }
     }
 
     @Override
-    public List<ItemOwnerDto> getUserItems(int ownerId) {
-        return itemsRepository.loadBookingsInItems(itemsRepository.findItemsWithCommentsByOwnerId(ownerId))
-                .stream().map(i -> ItemMapper.toItemOwnerDto(
-                        i,
-                        i.getComments().stream().map(CommentMapper::toDto).collect(Collectors.toList()),
-                        i.getBookings().stream().map(BookingMapper::toBookingCreateDto).collect(Collectors.toList())
-                ))
+    public List<ItemOwnerDto> getUserItems(int ownerId, int from, int size) {
+        return itemsRepository.loadBookingsInItems(
+                        itemsRepository.findItemsWithCommentsByOwnerId(ownerId, PageRequest.of(from, size))
+                ).stream()
+                .map(
+                        item -> ItemMapper.toItemOwnerDto(
+                                item, toCommentDtoList(item.getComments()), toBookingCreateDtoList(item.getBookings())
+                        )
+                )
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> findItems(String text) {
+    public List<ItemDto> findItems(String text, int from, int size) {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemsRepository.search(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        return itemsRepository.search(
+                text, PageRequest.of(from, size))
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList()
+        );
     }
 
     @Override
@@ -87,5 +102,20 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new BadRequestException("Можно комментировать только вещи которые вы брали в аренду"));
         comment.setItemId(itemId);
         return CommentMapper.toDto(commentsRepository.save(CommentMapper.toNewComment(comment, booking.getBooker())));
+    }
+
+    private List<CommentDto> toCommentDtoList(List<Comment> comments) {
+        return comments
+                .stream()
+                .map(CommentMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private List<BookingCreateDto> toBookingCreateDtoList(List<Booking> bookings) {
+        return bookings
+                .stream()
+                .filter(b -> b.getStatus() == BookingStatus.APPROVED)
+                .map(BookingMapper::toBookingCreateDto)
+                .collect(Collectors.toList());
     }
 }

@@ -38,22 +38,26 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> getUsersBookings(
-            @RequestHeader(name = "X-Sharer-User-Id") int userId,
-            @RequestParam(value = "state", required = false, defaultValue = "ALL") String state) {
+    public List<BookingDto> getUsersBookings(@RequestHeader(name = "X-Sharer-User-Id") int userId,
+                                             @RequestParam(value = "state", defaultValue = "ALL") String state,
+                                             @RequestParam(defaultValue = "0") int from,
+                                             @RequestParam(defaultValue = "20") int size) {
+        Validator.validatePaginationParams(from, size);
         try {
-            return bookingService.getUsersBookings(userId, State.valueOf(state));
+            return bookingService.getUsersBookings(userId, State.valueOf(state), from, size);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(String.format("Unknown state: %s", state));
         }
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getUserItemsBookings(
-            @RequestHeader(name = "X-Sharer-User-Id") int userId,
-            @RequestParam(value = "state", required = false, defaultValue = "ALL") String state) {
+    public List<BookingDto> getUserItemsBookings(@RequestHeader(name = "X-Sharer-User-Id") int userId,
+                                                 @RequestParam(value = "state", defaultValue = "ALL") String state,
+                                                 @RequestParam(defaultValue = "0") int from,
+                                                 @RequestParam(defaultValue = "20") int size) {
+        Validator.validatePaginationParams(from, size);
         try {
-            return bookingService.getUserItemsBookings(userId, State.valueOf(state));
+            return bookingService.getUserItemsBookings(userId, State.valueOf(state), from, size);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(String.format("Unknown state: %s", state));
         }
